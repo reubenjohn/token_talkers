@@ -8,6 +8,7 @@ packages = [{include = "token_talkers"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+openai = "^1.54.4"
 
 
 [tool.poetry.group.dev.dependencies]

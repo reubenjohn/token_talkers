@@ -1,28 +1,35 @@
-"""CLI interface for token_talkers project.
-
-Be creative! do whatever you want!
-
-- Install click or typer and create a CLI app
-- Use builtin argparse
-- Start a web application
-- Import things from your .base module
-"""
+from openai import OpenAI
+import argparse
 
 
 def main():  # pragma: no cover
     """
-    The main function executes on commands:
-    `python -m token_talkers` and `$ token_talkers `.
-
-    This is your program's entry point.
-
-    You can change this function to do whatever you want.
-    Examples:
-        * Run a test suite
-        * Run a server
-        * Do some other stuff
-        * Run a command line application (Click, Typer, ArgParse)
-        * List all available tasks
-        * Run an application (Flask, FastAPI, Django, etc.)
+    `python -m token_talkers` and `$ token_talkers`.
+    This function sets up a command-line interface (CLI) using argparse to parse
+    the required `--base_url` argument for the OpenAI API. It then creates an
+    OpenAI client and sends a chat completion request to the API with a predefined
+    prompt. The response is streamed and printed to the console.
     """
-    print("This will do something")
+
+    parser = argparse.ArgumentParser(description="Token Talkers CLI")
+    parser.add_argument(
+        "--base_url", type=str, required=True, help="The base URL for the OpenAI API"
+    )
+    args = parser.parse_args()
+
+    client = OpenAI(
+        base_url=args.base_url,
+        api_key="ollama",  # required, but unused
+    )
+
+    response = client.chat.completions.create(
+        model="llama3.1:8b",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Write a poem about a rainbow."},
+        ],
+        stream=True,  # this time, we set stream=True
+    )
+
+    for chunk in response:
+        print(chunk.choices[0].delta.content, end="")
