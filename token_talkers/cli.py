@@ -1,5 +1,6 @@
-from openai import OpenAI
 import argparse
+
+from openai import OpenAI
 
 
 def main():  # pragma: no cover

@@ -27,14 +27,15 @@ install:          ## Install the project in dev mode.
 .PHONY: fmt
 fmt:              ## Format code using black & isort.
 	$(ENV_PREFIX)isort token_talkers/
-	$(ENV_PREFIX)black -l 79 token_talkers/
-	$(ENV_PREFIX)black -l 79 tests/
+	$(ENV_PREFIX)black token_talkers/
+	$(ENV_PREFIX)black tests/
 
 .PHONY: lint
 lint:             ## Run pep8, black, mypy linters.
+	@echo $(ENV_PREFIX)
 	$(ENV_PREFIX)flake8 token_talkers/
-	$(ENV_PREFIX)black -l 79 --check token_talkers/
-	$(ENV_PREFIX)black -l 79 --check tests/
+	$(ENV_PREFIX)black --check token_talkers/
+	$(ENV_PREFIX)black --check tests/
 	$(ENV_PREFIX)mypy --ignore-missing-imports token_talkers/
 
 .PHONY: test
