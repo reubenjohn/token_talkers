@@ -48,8 +48,11 @@ jobs:
         run: make install
       - name: Run tests
         run: make test
-      - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@v4
+      # If you want codecov Reports and Automatic Release to PyPI
+      # On the new repository settings->secrets add your PYPI_API_TOKEN and CODECOV_TOKEN (get the tokens on respective websites)
+      # - name: "Upload coverage to Codecov"
+      #   uses: codecov/codecov-action@v4
+
         # with:
         #   fail_ci_if_error: true
 
