@@ -35,6 +35,24 @@ $ python -m token_talkers --openai_base_url http://192.168.1.199:11434/v1 --open
 #or
 $ token_talkers --openai_base_url http://192.168.1.199:11434/v1 --openai_api_key your_openai_api_key_here
 ```
+## Running File Index
+
+To run the `file_index.py` script from the command line, use the following instructions:
+
+1. Ensure you have Python installed on your system.
+2. Clone an example repository to use as a codebase. You can use the provided `setup_demo_repo.sh` script to clone the `requests` repository:
+
+```bash
+$ ./setup_demo_repo.sh /path/to/destination_folder
+```
+
+3. Run the `file_index.py` script to populate the file index database:
+
+```bash
+$ python file_index.py /path/to/destination_folder /path/to/database.db --wipe
+```
+
+This will index all files in the specified directory and store the information in the SQLite database.
 
 ## Development
 
