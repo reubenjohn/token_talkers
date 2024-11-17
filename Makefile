@@ -82,11 +82,6 @@ docs:             ## Build the documentation.
 	@$(ENV_PREFIX)mkdocs build
 	URL="site/index.html"; xdg-open $$URL || sensible-browser $$URL || x-www-browser $$URL || gnome-open $$URL || open $$URL
 
-.PHONY: init
-init:             ## Initialize the project based on an application template.
-	@./.github/init.sh
-
-
 # This project has been generated from rochacbruno/python-project-template
 # __author__ = 'rochacbruno'
 # __repo__ = https://github.com/rochacbruno/python-project-template

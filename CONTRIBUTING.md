@@ -5,6 +5,7 @@ token_talkers welcomes contributions from the community.
 **You need PYTHON3!**
 
 This instructions are for linux base systems. (Linux, MacOS, BSD, etc.)
+
 ## Setting up your own fork of this repo.
 
 - On github interface click on `Fork` button.
@@ -12,15 +13,55 @@ This instructions are for linux base systems. (Linux, MacOS, BSD, etc.)
 - Enter the directory `cd token_talkers`
 - Add upstream repo `git remote add upstream https://github.com/reubenjohn/token_talkers`
 
-## Setting up your own virtual environment
+## Help
 
-Run `make virtualenv` to create a virtual environment.
-then activate it with `source .venv/bin/activate`.
+Run `make help` to show the available make targets.
+
+## Show the current environment
+
+Run `make show` to display the current environment information.
 
 ## Install the project in develop mode
 
 Run `make install` to install the project in develop mode.
 
+## IDE reccomendations
+
+### VS Code
+
+#### Install VS Code Extensions
+
+To ensure that you have all the necessary tools for development, install the following VS Code extensions:
+
+- Python (ms-python.python)
+- Flake8 (ms-python.flake8)
+- MyPy (ms-python.mypy-type-checker)
+- Black Formatter (ms-python.black-formatter)
+
+You can install these extensions by searching for them in the Extensions view (`Ctrl+Shift+X`) in VS Code.
+
+#### ExampleVS Code Settings
+Create a `.vscode/settings.json` file in the root of your project with the following content (some of these settings can also be configured using the UI):
+
+```json
+{
+    "python.analysis.autoImportCompletions": true,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./tests",
+        "-p",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "flake8.importStrategy": "fromEnvironment",
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "black-formatter.importStrategy": "fromEnvironment"
+}
+```
+
+This configuration will set up VS Code to use the appropriate settings for linting, formatting, and testing.
 ## Run the tests to ensure everything is working
 
 Run `make test` to run the tests.
@@ -47,11 +88,19 @@ Run `make test` to run the tests.
 
 Ensure code coverage report shows `100%` coverage, add tests to your PR.
 
+## Watch tests
+
+Run `make watch` to run tests on every change.
+
 ## Build the docs locally
 
 Run `make docs` to build the docs.
 
 Ensure your new changes are documented.
+
+## Clean the project
+
+Run `make clean` to remove unused files and directories.
 
 ## Commit your changes
 
@@ -84,11 +133,8 @@ lint:             ## Run pep8, black, mypy linters.
 test: lint        ## Run tests and generate coverage report.
 watch:            ## Run tests on every change.
 clean:            ## Clean unused files.
-virtualenv:       ## Create a virtual environment.
 release:          ## Create a new tag for release.
 docs:             ## Build the documentation.
-switch-to-poetry: ## Switch to poetry package manager.
-init:             ## Initialize the project based on an application template.
 ```
 
 ## Making a new release

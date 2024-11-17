@@ -21,6 +21,8 @@ $ token_talkers
 
 ## Setup
 
+For instructions on setting up the project for development and contributions, see [CONTRIBUTING.md](CONTRIBUTING.md)
+
 To set up the environment variables, create a `.env` file in the root directory of your project and add the following lines:
 
 ```shell
