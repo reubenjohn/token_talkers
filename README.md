@@ -35,7 +35,33 @@ $ python -m token_talkers --openai_base_url http://192.168.1.199:11434/v1 --open
 #or
 $ token_talkers --openai_base_url http://192.168.1.199:11434/v1 --openai_api_key your_openai_api_key_here
 ```
-## Running File Index
+## File Index
+
+"""
+Schema Documentation:
+
+The SQLite database schema consists of two tables: `hard_files` and `soft_files`.
+
+1. `hard_files` Table:
+  - `path` (TEXT PRIMARY KEY): The absolute path to the file.
+  - `size` (INTEGER): The size of the file in bytes.
+  - `is_binary` (BOOLEAN): A flag indicating whether the file is binary.
+  - `number_of_lines` (INTEGER): The number of lines in the file (0 for binary files).
+  - `processed` (BOOLEAN): A flag indicating whether the file has been processed.
+
+  This table stores metadata about the actual files present in the file system.
+
+2. `soft_files` Table:
+  - `path` (TEXT PRIMARY KEY): The absolute path to the symbolic link.
+  - `hard_path` (TEXT): The absolute path to the actual file that the symbolic link points to.
+    - FOREIGN KEY(hard_path) REFERENCES `hard_files`(path)
+
+  This table stores metadata about symbolic links and their corresponding actual files.
+
+The schema is used to index files and symbolic links in a directory, allowing for efficient querying and management of file metadata.
+"""
+
+### Running File Index
 
 To run the `file_index.py` script from the command line, use the following instructions:
 
