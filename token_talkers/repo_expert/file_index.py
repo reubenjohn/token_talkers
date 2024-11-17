@@ -1,6 +1,7 @@
+import logging
 import sqlite3
 from abc import ABC, abstractmethod
-from typing import Iterator, List, NamedTuple
+from typing import Iterator, List, NamedTuple, Optional, Tuple
 import os
 from pathlib import Path
 import argparse
@@ -9,8 +10,8 @@ import argparse
 class HardFileRecord(NamedTuple):
     path: str
     size: int
-    is_binary: bool
-    number_of_lines: int
+    is_binary: Optional[bool]
+    number_of_lines: Optional[int]
     processed: bool = True
 
 
@@ -73,19 +74,19 @@ class SQLiteFileIndex(FileIndex):
         self._cursor.execute(
             f"""
             CREATE TABLE IF NOT EXISTS {self.HARD_FILES} (
-                path TEXT PRIMARY KEY,
-                size INTEGER,
+                path TEXT PRIMARY KEY NOT NULL,
+                size INTEGER NOT NULL,
                 is_binary BOOLEAN,
                 number_of_lines INTEGER,
-                processed BOOLEAN
+                processed BOOLEAN NOT NULL
             )
         """
         )
         self._cursor.execute(
             f"""
             CREATE TABLE IF NOT EXISTS {self.SOFT_FILES} (
-                path TEXT PRIMARY KEY,
-                hard_path TEXT,
+                path TEXT PRIMARY KEY NOT NULL,
+                hard_path TEXT NOT NULL,
                 FOREIGN KEY(hard_path) REFERENCES {self.HARD_FILES}(path)
             )
         """
@@ -108,7 +109,7 @@ class SQLiteFileIndex(FileIndex):
             self._conn.commit()
             return True
         except Exception as e:
-            print(f"Error inserting record: {e}")
+            logging.error(f"Error inserting record: {e}")
             return False
 
     def query_hard_records(self, fuzzy_path: str) -> Iterator[HardFileRecord]:
@@ -126,7 +127,7 @@ class SQLiteFileIndex(FileIndex):
             self._conn.commit()
             return True
         except Exception as e:
-            print(f"Error inserting record: {e}")
+            logging.error(f"Error inserting record: {e}")
             return False
 
     def query_soft_records(self, fuzzy_path: str) -> Iterator[SoftFileRecord]:
@@ -154,42 +155,48 @@ def populate_index(index: FileIndex, input_dir: Path, wipe: bool = False):
     for root, _, files in os.walk(input_dir, followlinks=True):
         for file in files:
             file_path = Path(root) / file
-            resolved_path = str(file_path.resolve())
-            hard_record_exists = any(index.query_hard_records(resolved_path))
+            resolved_path = file_path.resolve()
+            hard_record_exists = any(index.query_hard_records(str(resolved_path)))
 
             if not hard_record_exists:
-                is_binary = False
-                number_of_lines = 0
-                processed = False
-                try:
-                    with open(file_path, "rb") as f:
-                        is_binary = b"\0" in f.read(1024)
-                        number_of_lines = 0
-                    if not is_binary:
-                        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                            try:
-                                for _ in f:
-                                    number_of_lines += 1
-                            except UnicodeDecodeError:
-                                is_binary = True
-                                number_of_lines = 0
-                    processed = True
-                except Exception as e:
-                    print(f"Error processing file {file_path}: {e}")
-
-                hard_file = HardFileRecord(
-                    path=resolved_path,
-                    size=file_path.stat().st_size,
-                    is_binary=is_binary,
-                    number_of_lines=number_of_lines,
-                    processed=processed,
-                )
-                index.insert_hard_records([hard_file])
+                create_hard_file_record(index, file_path, resolved_path)
 
             soft_record = SoftFileRecord(
-                path=str(os.path.abspath(file_path)), hard_path=resolved_path
+                path=str(os.path.abspath(file_path)), hard_path=str(resolved_path)
             )
             index.insert_soft_records([soft_record])
+
+
+def create_hard_file_record(index: FileIndex, file_path: Path, resolved_path: Path):
+    success, is_binary, number_of_lines = _extract_file_metadata(file_path)
+
+    hard_file = HardFileRecord(
+        path=str(resolved_path),
+        size=file_path.stat().st_size,
+        is_binary=is_binary,
+        number_of_lines=number_of_lines,
+        processed=success,
+    )
+    index.insert_hard_records([hard_file])
+
+
+def _extract_file_metadata(file_path: Path) -> Tuple[bool, Optional[bool], Optional[int]]:
+    try:
+        with open(file_path, "rb") as f:
+            is_binary = b"\0" in f.read(1024)
+        if is_binary:
+            return True, True, 0
+
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            try:
+                number_of_lines = sum(1 for _ in f)
+            except UnicodeDecodeError:
+                is_binary = True
+                number_of_lines = 0
+        return True, is_binary, number_of_lines
+    except Exception as e:
+        logging.error(f"Error processing file {file_path}: {e}")
+    return False, None, None
 
 
 if __name__ == "__main__":
