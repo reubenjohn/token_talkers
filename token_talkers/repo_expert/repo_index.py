@@ -82,7 +82,7 @@ class SQLiteNodeIndex(NodeIndex):
             if not self._is_valid_container_reference(record):
                 raise sqlite3.IntegrityError(
                     f"Cannot insert into nodes. "
-                    f"Container foreign key constraing violated. "
+                    f"Container foreign key constraint violated. "
                     f"hard_file_path={record.hard_file_path} name={record.container} "
                     f"does not exist in {self.NODES}"
                 )

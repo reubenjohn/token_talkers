@@ -7,9 +7,11 @@ readme = "README.md"
 packages = [{include = "token_talkers"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 openai = "^1.54.4"
 python-dotenv = "^1.0.1"
+swarm = { git = "https://github.com/openai/swarm.git"}
+instructor = "^1.6.4"
 
 
 [tool.poetry.group.dev.dependencies]
